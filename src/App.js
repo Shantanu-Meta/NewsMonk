@@ -6,6 +6,7 @@ import About from './components/About';
 import { Route, Routes } from 'react-router-dom';
 
 export default class App extends Component {
+
   render() {
     return (
       <div>
