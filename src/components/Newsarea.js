@@ -42,7 +42,8 @@ export default class Newsarea extends Component {
     this.setState({articles: newArticles}); 
   }
 
-  async componentDidMount(){    window.scrollTo(0,0); 
+  async componentDidMount(){    
+    window.scrollTo(0,0); 
     this.setState({progress: 10})
     await this.fetchData();    
     this.setState({progress: 100})
@@ -111,6 +112,5 @@ export default class Newsarea extends Component {
         </div>
       </div>
     )
-    
   }
 }
