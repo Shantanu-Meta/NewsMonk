@@ -17,7 +17,6 @@ export default class Newsarea extends Component {
       totalResults: null, 
       load: true,
       progress: 0, 
-      searchedData: "",
     }
     document.title = `NewsMonk | ${this.capitalize(this.props.category)}`; 
   }
@@ -30,16 +29,11 @@ export default class Newsarea extends Component {
     this.setState({
       articles: this.state.articles.concat(data.articles),
       totalResults: data.totalResults,
-      load: false,
+    },()=>{
+      console.log(data.totalResults)
+    console.log(this.state.articles.length)
     });   
-  }
-
-  searchData= (value)=>{
-    let newArticles = []; 
-    this.state.articles.forEach(element => {
-      if(element.title.includes(value) || element.description.includes(value)) newArticles.push(element); 
-    });
-    this.setState({articles: newArticles}); 
+    
   }
 
   async componentDidMount(){    
@@ -49,31 +43,45 @@ export default class Newsarea extends Component {
     this.setState({progress: 100})
   }
 
-  fetchMoreData = async ()=>{    console.log("fetch More")
+  fetchMoreData = async ()=>{    
+    console.log(this.state.load)
     this.setState({page: this.state.page + 1}, ()=>{
       this.fetchData(); 
     })
   }
 
-  searchArticle = ()=>{
-    if(this.state.searchedData==="") return; 
-    let newArticles = []; 
-    for(let i=0; i<this.state.articles.length; i++){
-      let ele = this.state.articles[i]; 
-      if(ele.title && ele.description && (ele.title.includes(this.state.searchedData) || ele.description.includes(this.state.searchedData))){
-        newArticles.push(ele); 
-      }
+  searchArticle = (event)=>{
+    console.log(event.target.value)
+    let val = event.target.value.toUpperCase();
+    let cards = document.querySelectorAll(".card");
+    cards = Array.from(cards)
+    if(val.length===0){
+      console.log("Got")
+      this.setState({
+        load: true,
+      })    
+    }else{
+      this.setState({
+        load: false,
+      })  
     }
-    if(newArticles.length !==0 )
-      this.setState({articles: newArticles}); 
-    else alert("No Match found")
+    cards.forEach(ele=>{
+      let title = ele.querySelector('.title');
+      let desc = ele.querySelector('.desc');
+      if (title.textContent.toUpperCase().indexOf(val) > -1 || desc.textContent.toUpperCase().indexOf(val) > -1) {
+        ele.style.display="block";
+    } else {
+        ele.style.display="none";
+    }
+    })
+    
   }
 
   capitalize(string){
     return string.charAt(0).toUpperCase() + string.slice(1); 
   }
 
-  render(){   
+  render(){
     return(
       <div className='w-full'>
         <LoadingBar
@@ -90,18 +98,16 @@ export default class Newsarea extends Component {
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                             </svg>
                         </div>
-                        <input onChange={(e) => {
-                          this.setState({searchedData: e.target.value})}} type="text" id="default-search" className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search news.." required/>
-
-                          <button type="button" className="text-white absolute end-1 top-[50%] translate-y-[-50%]  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={this.searchArticle}>Search</button>
+                        <input onInput={this.searchArticle} type="text" id="default-search" className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search news.." required/>
                     </div>
               </form>
         </div>}
+
           <InfiniteScroll
             dataLength={this.state.articles.length}
-            next={this.state.searchedData.length===0 && this.fetchMoreData}
+            next={this.state.load && this.state.articles.length!==this.state.totalResults &&  this.fetchMoreData}
             hasMore={this.state.totalResults!==this.state.articles.length}
-            loader={this.state.searchedData.length===0 && <Loading/>}
+            loader={this.state.load && this.state.articles.length!==this.state.totalResults && <Loading/>}
           >
           <div className='flex align-center justify-evenly flex-wrap gap-1'>
             {this.state.articles.map((ele) =>{
