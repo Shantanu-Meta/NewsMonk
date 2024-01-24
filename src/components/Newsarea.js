@@ -3,6 +3,7 @@ import NewsItem from './NewsItem'
 import Loading from './Loading'
 import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingBar from 'react-top-loading-bar'
+import '../App.css'
 
 export default class Newsarea extends Component {
   defaultDesc = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsum alias eius aut laboriosam minima facilis enim! Laborum necessitatibus eaque vitae."
@@ -21,7 +22,6 @@ export default class Newsarea extends Component {
     document.title = `NewsMonk | ${this.capitalize(this.props.category)}`; 
   }
   
-
    fetchData = async ()=>{
     let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=${process.env.REACT_APP_API_KEY}&page=${this.state.page}&pageSize=10`
     let response =await fetch(url);
@@ -29,14 +29,11 @@ export default class Newsarea extends Component {
     this.setState({
       articles: this.state.articles.concat(data.articles),
       totalResults: data.totalResults,
-    },()=>{
-      console.log(data.totalResults)
-    console.log(this.state.articles.length)
     });   
     
   }
 
-  async componentDidMount(){    
+  async componentDidMount(){   
     window.scrollTo(0,0); 
     this.setState({progress: 10})
     await this.fetchData();    
@@ -44,19 +41,16 @@ export default class Newsarea extends Component {
   }
 
   fetchMoreData = async ()=>{    
-    console.log(this.state.load)
     this.setState({page: this.state.page + 1}, ()=>{
       this.fetchData(); 
     })
   }
 
   searchArticle = (event)=>{
-    console.log(event.target.value)
     let val = event.target.value.toUpperCase();
     let cards = document.querySelectorAll(".card");
     cards = Array.from(cards)
     if(val.length===0){
-      console.log("Got")
       this.setState({
         load: true,
       })    
@@ -89,8 +83,8 @@ export default class Newsarea extends Component {
           progress={this.state.progress}
         />
         <div className='w-[90%] mx-auto mt-[5rem] pb-[0.5rem]'>
-        {this.state.articles.length>0 && <h1 className='text-3xl text-center mb-3'>NewsMonk - {this.capitalize(this.props.category)}</h1>}
-        { this.state.articles.length>0 && <div className='w-[30%] mx-auto my-[1rem]'>
+        {this.state.articles.length>0 && <h1 className='header text-3xl text-center mb-3'>NewsMonk - {this.capitalize(this.props.category)}</h1>}
+        { this.state.articles.length>0 && <div className='w-[90%] md:w-[30%] mx-auto my-[1rem]'>
               <form autoComplete="off">   
                     <div className="relative">
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -98,15 +92,15 @@ export default class Newsarea extends Component {
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                             </svg>
                         </div>
-                        <input onInput={this.searchArticle} type="text" id="default-search" className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search news.." required/>
+                        <input onInput={this.searchArticle} type="text" id="default-search" className="outline-none block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search news.." required/>
                     </div>
               </form>
         </div>}
 
           <InfiniteScroll
             dataLength={this.state.articles.length}
-            next={this.state.load && this.state.articles.length!==this.state.totalResults &&  this.fetchMoreData}
-            hasMore={this.state.totalResults!==this.state.articles.length}
+            next={this.state.articles.length && this.fetchMoreData}
+            hasMore={ this.state.load && this.state.totalResults!==this.state.articles.length}
             loader={this.state.load && this.state.articles.length!==this.state.totalResults && <Loading/>}
           >
           <div className='flex align-center justify-evenly flex-wrap gap-1'>

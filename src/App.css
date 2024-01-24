@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans&family=Ubuntu+Mono&family=Ubuntu:wght@300&display=swap');
+
+.header{
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 800;
+}
+
+body{
+    background: whitesmoke;
+}
